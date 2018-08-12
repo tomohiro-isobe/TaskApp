@@ -11,6 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -37,10 +40,42 @@ public class MainActivity extends AppCompatActivity {
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
 
+    private EditText mSearchEdit;
+    private Button searchButton;
+    private Button reload;
+    private Task mTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
+
+
+        // カテゴリー検索
+        mSearchEdit = (EditText) findViewById(R.id.search_edit_text);
+        searchButton = (Button) findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                    RealmResults<Task> query = mRealm.where(Task.class).equalTo("category", mSearchEdit.getText().toString()).findAll();
+
+                    mTaskAdapter.setTaskList(mRealm.copyFromRealm(query));
+                    mListView.setAdapter(mTaskAdapter);
+                    mTaskAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+        // リロード
+        reload = (Button) findViewById(R.id.reload_button);
+        reload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reloadListView();
+            }
+        });
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
