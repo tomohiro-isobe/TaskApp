@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText mSearchEdit;
     private Button searchButton;
     private Button reload;
-    private Task mTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +56,18 @@ public class MainActivity extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                    RealmResults<Task> query = mRealm.where(Task.class).equalTo("category", mSearchEdit.getText().toString()).findAll();
+                // 検索欄に何も入力されていない時の場合分け
+                if (!mSearchEdit.getText().toString().equals("")) {
+                    RealmResults<Task> query = mRealm.where(Task.class).equalTo("category", mSearchEdit.getText().toString()).findAll().sort("date", Sort.DESCENDING);
 
                     mTaskAdapter.setTaskList(mRealm.copyFromRealm(query));
                     mListView.setAdapter(mTaskAdapter);
                     mTaskAdapter.notifyDataSetChanged();
+                } else {
+                    reloadListView();
+                }
+
+
 
             }
         });
